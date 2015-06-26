@@ -1,0 +1,20 @@
+# Ignore python temp files
+*.pyc
+*.py~
+
+# Ignore python cache directory
+__pycache__/
+
+# Ignore Eclipse generated files
+.project
+.pydevproject
+.settings/
+
+# Jetbrain PyCharm
+.idea/
+
+# Ignore virtualenv files
+env/
+
+# Ignore mac useless files
+.DS_Store
