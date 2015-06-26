@@ -21,8 +21,11 @@ class DirMonitor():
         self._lock = threading.Lock()
         self.ignore_path = os.path.join(self.target_dir, ".gitignore")
         self.callback = callback or self._callback
-        self._thread = threading.Thread(target=self._monitor)
-        self._thread.setDaemon(True)
+        self._threads = []
+        self.working_thread = threading.Thread(target=self._monitor)
+        self.working_thread.setDaemon(True)
+        self._threads.append(self.working_thread)
+
         atexit.register(self._exiting)
 
     def _monitor(self):
@@ -41,7 +44,10 @@ class DirMonitor():
                         elif self._modified(item_path):
                             if item == ".gitignore":
                                 self._update_ignore()
-                            self.callback(item_path)
+                            thread = threading.Thread(target=self.callback, args=(item_path,))
+                            thread.start()
+                            self._threads.append(thread)
+
             time.sleep(1)
 
     def _ignored(self, item_path):
@@ -64,7 +70,6 @@ class DirMonitor():
                         self.ignore_pattern.append(line[:-1])
         self.ignore_pattern.append(".git/")
 
-
     def start(self, interval=1.0):
         if interval < self._interval:
             self._interval = interval
@@ -74,11 +79,12 @@ class DirMonitor():
             prefix = 'monitor (pid=%d):' % os.getpid()
             print('%s Starting change monitor.' % prefix, file=sys.stderr)
             self._running = True
-            self._thread.start()
+            self.working_thread.start()
         self._lock.release()
 
     def _exiting(self):
-        self._thread.join()
+        for thread in self._threads:
+            thread.join()
 
     def _modified(self, path):
         try:
