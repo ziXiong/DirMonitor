@@ -1,7 +1,12 @@
+# Add package dirmonitor to PATHONPATH
+import sys
+import os
+path = os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir))
+sys.path.append(path)
+
 import time
 from dirmonitor import DirMonitor
 import subprocess
-import os
 
 local_dir = "/Users/harley/workspace/Django-autodeploy"
 remote_dir = "/www/Django-autodeploy"
