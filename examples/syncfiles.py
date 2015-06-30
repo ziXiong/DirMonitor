@@ -8,8 +8,8 @@ import time
 from dirmonitor import DirMonitor
 import subprocess
 
-local_dir = "/Users/harley/workspace/Django-autodeploy"
-remote_dir = "/www/Django-autodeploy"
+local_dir = "/Users/harley/workspace/weshop"
+remote_dir = "/var/www/weshop"
 remote_user = "root"
 remote_host = "yunserver"
 
@@ -21,6 +21,8 @@ def callback(path):
     command = "ssh " + remote_user + "@" + remote_host + " 'mkdir -p " + "/".join(remote_path.split("/")[:-1]) + "'"
     subprocess.check_call(command, shell=True, executable="/bin/bash")
     command = "scp " + path + " " + remote_user + "@" + remote_host + ":" + remote_path
+    subprocess.check_call(command, shell=True, executable="/bin/bash")
+    command = "ssh " + remote_user + "@" + remote_host + " 'touch " + remote_dir + "/weshop/wsgi.py'"
     subprocess.check_call(command, shell=True, executable="/bin/bash")
     print("Succeed sending " + relative_path + " to " + remote_host + ":" + remote_path + "\n")
 

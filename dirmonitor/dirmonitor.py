@@ -55,7 +55,7 @@ class DirMonitor():
             item_path += "/"
         for pattern in self.ignore_pattern:
             regex = fnmatch.translate(pattern)
-            if re.search(regex, item_path[len(self.target_dir):]):
+            if re.search(regex, item_path[len(self.target_dir)+1:]):
                 return True
         return False
 
@@ -63,7 +63,7 @@ class DirMonitor():
         self.ignore_pattern = []
         if os.path.isfile(self.ignore_path):
             with open(self.ignore_path, "r+") as file:
-                pattern = re.compile(r"\s*#")
+                pattern = re.compile(r"^\s*[#\n]")
                 lines = file.readlines()
                 for line in lines:
                     if not pattern.match(line):
@@ -78,6 +78,7 @@ class DirMonitor():
         if not self._running:
             prefix = 'monitor (pid=%d):' % os.getpid()
             print('%s Starting change monitor.' % prefix, file=sys.stderr)
+            print("Monitor directory %s." % self.target_dir)
             self._running = True
             self.working_thread.start()
         self._lock.release()
